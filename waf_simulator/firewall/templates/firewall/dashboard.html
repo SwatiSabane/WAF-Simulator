@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WAF Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="max-w-4xl mx-auto mt-10 p-6 bg-white shadow-lg rounded-xl">
+        <h1 class="text-3xl font-bold mb-6 text-center">Web Application Firewall Dashboard</h1>
+
+        <!-- Search Form -->
+        <form method="GET" class="mb-4">
+            <input type="text" name="q" placeholder="Search rules..." value="{{ request.GET.q }}" class="border p-2 rounded w-1/2">
+            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded ml-2 hover:bg-blue-700">Search</button>
+          </form>
+
+        <!-- Add Rule Form -->
+        <div class="mb-8">
+            <h2 class="text-xl font-semibold mb-2">Add New Rule</h2>
+            <form method="POST" action="{% url 'add_rule' %}" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {% csrf_token %}
+                <input type="text" name="name" placeholder="Rule name" required class="border p-2 rounded">
+                <input type="text" name="pattern" placeholder="Rule pattern (e.g., 1 OR 1=1)" required class="border p-2 rounded">
+                <div class="col-span-2">
+                    <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Add Rule</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Rule List -->
+        <h2 class="text-xl font-semibold mb-4">Existing Rules</h2>
+        <table class="w-full table-auto border border-gray-200 rounded">
+            <thead class="bg-gray-200">
+                <tr>
+                    <th class="p-2">Name</th>
+                    <th class="p-2">Pattern</th>
+                    <th class="p-2">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if rules %}
+                    {% for rule in rules %}
+                    <tr class="border-t">
+                        <td class="p-2">{{ rule.name }}</td>
+                        <td class="p-2">{{ rule.pattern }}</td>
+                        <td class="p-2">
+                            {% if rule.is_active %}
+                                <span class="text-green-600 font-semibold">Active</span>
+                            {% else %}
+                                <span class="text-red-600 font-semibold">Inactive</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr><td colspan="3" class="text-center p-4 text-gray-500">No rules found.</td></tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
